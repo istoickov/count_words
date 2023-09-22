@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from models import URLInput
@@ -28,7 +28,15 @@ def count_words(data: URLInput):
         url(data.url)
         count = count_words_on_page(data.url)
         return {"word_count": count}
-    except ValidationError as e:
-        return {"error": "url not valid"}
-    except Exception as e:
-        return {"error": str(e)}
+    except ValidationError as exception:
+        raise HTTPException(
+            status_code=500,
+            detail="URL not valid",
+            headers={"X-Error": f"Error: {str(exception)}"},
+        )
+    except Exception as exception:
+        raise HTTPException(
+            status_code=400,
+            detail=str(exception),
+            headers={"X-Error": f"Error: {str(exception)}"},
+        )

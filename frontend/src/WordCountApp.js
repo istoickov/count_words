@@ -33,10 +33,19 @@ function WordCountApp() {
         },
         body: JSON.stringify({ url }),
       });
-      const data = await response.json();
-      setWordCount(data.word_count);
+
+      if (response.status === 200) {
+        const data = await response.json();
+        setWordCount(data.word_count);
+        setError(null);
+      } else {
+        const errorData = await response.json();
+        setError("An error occurred while fetching the URL.");
+        setWordCount(null)
+      }
     } catch (error) {
       console.error("Error:", error);
+      setWordCount(null)
       setError("An error occurred while fetching the URL.");
     } finally {
       setIsLoading(false);
@@ -53,11 +62,13 @@ function WordCountApp() {
           value={url}
           onChange={handleUrlChange}
         />
-        <button onClick={handleSubmit}>Count Words</button>
+        <button onClick={handleSubmit} disabled={isLoading}>
+          {isLoading ? "Counting..." : "Count Words"}
+        </button>
       </div>
       {isLoading && <div className="spinner"></div>}
-      {error && <div className="error">{error}</div>}
-      {wordCount !== null && (
+      {wordCount == null && error !== null && <div className="error">{error}</div>}
+      {error == null && wordCount !== null && (
         <div className="result">
           Number of words on the page: {wordCount}
         </div>
