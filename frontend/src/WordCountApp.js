@@ -1,16 +1,30 @@
 import React, { useState } from "react";
+import "./WordCountApp.css";
 
 function WordCountApp() {
   const [url, setUrl] = useState("");
   const [wordCount, setWordCount] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleUrlChange = (event) => {
     setUrl(event.target.value);
   };
 
+  const isValidURL = (inputURL) => {
+    const urlPattern = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/i;
+    return urlPattern.test(inputURL);
+  };
+
   const handleSubmit = async () => {
+    if (!isValidURL(url)) {
+      setError("Please enter a valid URL.");
+      return;
+    }
+
     setIsLoading(true);
+    setError(null);
+
     try {
       const response = await fetch("http://www.localhost:8000/count-words/", {
         method: "POST",
@@ -23,6 +37,7 @@ function WordCountApp() {
       setWordCount(data.word_count);
     } catch (error) {
       console.error("Error:", error);
+      setError("An error occurred while fetching the URL.");
     } finally {
       setIsLoading(false);
     }
@@ -41,8 +56,11 @@ function WordCountApp() {
         <button onClick={handleSubmit}>Count Words</button>
       </div>
       {isLoading && <div className="spinner"></div>}
+      {error && <div className="error">{error}</div>}
       {wordCount !== null && (
-        <div className="result">Number of words on the page: {wordCount}</div>
+        <div className="result">
+          Number of words on the page: {wordCount}
+        </div>
       )}
     </div>
   );
