@@ -39,7 +39,6 @@ function WordCountApp() {
         setWordCount(data.word_count);
         setError(null);
       } else {
-        const errorData = await response.json();
         setError("An error occurred while fetching the URL.");
         setWordCount(null)
       }
