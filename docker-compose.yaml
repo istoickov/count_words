@@ -7,7 +7,7 @@ services:
     ports:
       - "3000:3000"
     working_dir: /app/frontend
-    volumes:
+volumes:
       - ./frontend:/app/frontend
     depends_on:
       - backend
@@ -21,7 +21,7 @@ services:
     ports:
       - "8000:8000"
     working_dir: /app/backend
-    volumes:
+volumes:
       - ./backend:/app/backend
     networks:
       - app-network

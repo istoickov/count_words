@@ -1,5 +1,5 @@
 # Use an official Node.js runtime as the base image for the frontend
-FROM node:14 as frontend
+FROM node:14-alpine as build
 
 # Set the working directory to /app/frontend
 WORKDIR /app/frontend
@@ -8,16 +8,16 @@ WORKDIR /app/frontend
 COPY frontend/package*.json ./
 
 # Install frontend dependencies
-RUN npm install
+RUN yarn install
 
 # Copy the frontend source code into the container
 COPY frontend ./
 
 # Build the frontend
-RUN npm run build
+FROM nginx:stable-alpine
 
-# Expose port 3000
-EXPOSE 3000
+COPY --from=build /app/build /usr/share/nginx/html
 
-# Define the command to start the frontend
-CMD ["npm", "start"]
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
